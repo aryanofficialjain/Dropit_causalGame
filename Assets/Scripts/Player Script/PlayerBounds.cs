@@ -32,7 +32,7 @@ public class PlayerBound : MonoBehaviour
 
                 // sound manager death sound;
                 SoundManager.instance.DeathSound();
-                GameManager.instance.RestartGame();
+                 GameManager.instance.ShowGameOver();
                 // gamemanager restart game;
             }
         }
@@ -42,7 +42,7 @@ public class PlayerBound : MonoBehaviour
         if(target.tag == "Top Spikes"){
             transform.position = new Vector2(1000f, 1000f);
                  SoundManager.instance.DeathSound();
-                GameManager.instance.RestartGame();
+                 GameManager.instance.ShowGameOver();
         }
     }
 }
