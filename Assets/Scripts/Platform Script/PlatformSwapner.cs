@@ -5,7 +5,6 @@ using UnityEngine;
 public class PlatformSpawner : MonoBehaviour
 {
     public GameObject platformPrefab;
-    public GameObject spikePlatformPrefab;
     public GameObject[] moving_Platforms;
     public GameObject breakablePlatform;
 
@@ -13,7 +12,9 @@ public class PlatformSpawner : MonoBehaviour
     private float current_Platform_Spawn_Timer;
     private int platform_Spawn_Count;
 
-    public float min_X = -2f, max_X = 2f;
+    // Define three possible X positions for platforms in a row
+    public float[] platformPositionsX = new float[] { -2f, 0f, 2f };
+    public float yOffsetRange = 0.5f; // Range for random y offset
 
     void Start()
     {
@@ -22,28 +23,38 @@ public class PlatformSpawner : MonoBehaviour
 
     void Update()
     {
-        SpawnPlatform();
+        SpawnPlatformRow();
     }
-    
-    void SpawnPlatform()
+
+    void SpawnPlatformRow()
     {
         current_Platform_Spawn_Timer += Time.deltaTime;
 
         if (current_Platform_Spawn_Timer >= platform_Spawn_Timer)
         {
             platform_Spawn_Count++;
-            Vector3 temp = transform.position;
-            temp.x = Random.Range(min_X, max_X);
 
-            GameObject newPlatform = null;
+            // Create a temporary list of positions and pick two random positions from it
+            List<float> availablePositions = new List<float>(platformPositionsX);
+            for (int i = 0; i < 2; i++) // Spawn only two platforms
+            {
+                int randomIndex = Random.Range(0, availablePositions.Count);
+                Vector3 temp = transform.position;
+                temp.x = availablePositions[randomIndex];
+                availablePositions.RemoveAt(randomIndex); // Remove chosen position to avoid duplication
 
-            if (platform_Spawn_Count < 2)
-            {
-                newPlatform = Instantiate(platformPrefab, temp, Quaternion.identity);
-            }
-            else if (platform_Spawn_Count == 2)
-            {
-                if (Random.Range(0, 2) > 0)
+                // Add a small random y-offset to create variety in height
+                temp.y += Random.Range(-yOffsetRange, yOffsetRange);
+
+                GameObject newPlatform = null;
+
+                // Randomly select the type of platform to spawn
+                if (platform_Spawn_Count == 4 && Random.Range(0, 2) == 0)
+                {
+                    newPlatform = Instantiate(breakablePlatform, temp, Quaternion.identity);
+                    platform_Spawn_Count = 0; // Reset count after breakable platform
+                }
+                else if (Random.Range(0, 2) > 0)
                 {
                     newPlatform = Instantiate(platformPrefab, temp, Quaternion.identity);
                 }
@@ -51,38 +62,14 @@ public class PlatformSpawner : MonoBehaviour
                 {
                     newPlatform = Instantiate(moving_Platforms[Random.Range(0, moving_Platforms.Length)], temp, Quaternion.identity);
                 }
-            }
-            else if (platform_Spawn_Count == 3)
-            {
-                if (Random.Range(0, 2) > 0)
-                {
-                    newPlatform = Instantiate(platformPrefab, temp, Quaternion.identity);
-                }
-                else
-                {
-                    newPlatform = Instantiate(spikePlatformPrefab, temp, Quaternion.identity);
-                }
-            }
-            else if (platform_Spawn_Count == 4)
-            {
-                if (Random.Range(0, 2) > 0)
-                {
-                    newPlatform = Instantiate(platformPrefab, temp, Quaternion.identity);
-                }
-                else
-                {
-                    newPlatform = Instantiate(breakablePlatform, temp, Quaternion.identity);
-                }
 
-                platform_Spawn_Count = 0;
+                if (newPlatform)
+                {
+                    newPlatform.transform.parent = transform;
+                }
             }
 
-            if (newPlatform)
-            {
-                newPlatform.transform.parent = transform;
-            }
-
-            current_Platform_Spawn_Timer = 0;
+            current_Platform_Spawn_Timer = 0; // Reset timer after spawning row
         }
     }
 }
