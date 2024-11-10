@@ -20,6 +20,9 @@ public class PlayPauseScript : MonoBehaviour
             Time.timeScale = 1;
             isGamePaused = false;
             playPauseButton.GetComponentInChildren<Text>().text = "Pause";
+
+            // Resume background music
+            SoundManager.instance.ToggleBackgroundMusic(false);
         }
         else
         {
@@ -27,6 +30,9 @@ public class PlayPauseScript : MonoBehaviour
             Time.timeScale = 0;
             isGamePaused = true;
             playPauseButton.GetComponentInChildren<Text>().text = "Play";
+
+            // Pause background music
+            SoundManager.instance.ToggleBackgroundMusic(true);
         }
     }
 }

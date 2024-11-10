@@ -4,10 +4,7 @@ using UnityEngine;
 
 public class PlatformScript : MonoBehaviour
 {
-    // Start is called before the first frame update
-
     public float move_Speed = 2f;
-
     public float bound_Y = 6f;
 
     public bool moving_Platform_Left, moving_Platform_Right, is_Breakable, is_Spike, is_Platform;
@@ -21,7 +18,6 @@ public class PlatformScript : MonoBehaviour
             anim = GetComponent<Animator>();
         }
     }
-
 
     void Update()
     {
@@ -39,7 +35,6 @@ public class PlatformScript : MonoBehaviour
         {
             gameObject.SetActive(false);
         }
-
     }
 
     void BreakableDeactivate()
@@ -49,7 +44,7 @@ public class PlatformScript : MonoBehaviour
 
     void DeactivateGameObject()
     {
-        SoundManager.instance.iceBreakSound();
+        SoundManager.instance.IceBreakSound();
         gameObject.SetActive(false);
     }
 
@@ -72,14 +67,13 @@ public class PlatformScript : MonoBehaviour
         {
             if (is_Breakable)
             {
-                 SoundManager.instance.LandSound();
+                SoundManager.instance.LandSound();
                 anim.Play("Break");
             }
 
             if (is_Platform)
             {
-                 SoundManager.instance.LandSound();
-                // GameManager.instance.RestartGame();
+                SoundManager.instance.LandSound();
             }
         }
     }
@@ -91,15 +85,12 @@ public class PlatformScript : MonoBehaviour
             if (moving_Platform_Left)
             {
                 target.gameObject.GetComponent<PlayerScript>().PlatformMove(-1f);
-
             }
 
             if (moving_Platform_Right)
             {
                 target.gameObject.GetComponent<PlayerScript>().PlatformMove(1f);
-
             }
         }
-
     }
 }

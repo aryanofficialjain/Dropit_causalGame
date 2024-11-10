@@ -7,14 +7,12 @@ public class PlatformSpawner : MonoBehaviour
     public GameObject platformPrefab;
     public GameObject[] moving_Platforms;
     public GameObject breakablePlatform;
-
     public float platform_Spawn_Timer = 2f;
     private float current_Platform_Spawn_Timer;
     private int platform_Spawn_Count;
 
-    // Define three possible X positions for platforms in a row
     public float[] platformPositionsX = new float[] { -2f, 0f, 2f };
-    public float yOffsetRange = 0.5f; // Range for random y offset
+    public float yOffsetRange = 0.5f;
 
     void Start()
     {
@@ -33,35 +31,17 @@ public class PlatformSpawner : MonoBehaviour
         if (current_Platform_Spawn_Timer >= platform_Spawn_Timer)
         {
             platform_Spawn_Count++;
-
-            // Create a temporary list of positions and pick two random positions from it
             List<float> availablePositions = new List<float>(platformPositionsX);
-            for (int i = 0; i < 2; i++) // Spawn only two platforms
+
+            for (int i = 0; i < 2; i++) // Spawn two platforms in each row
             {
                 int randomIndex = Random.Range(0, availablePositions.Count);
-                Vector3 temp = transform.position;
-                temp.x = availablePositions[randomIndex];
-                availablePositions.RemoveAt(randomIndex); // Remove chosen position to avoid duplication
+                Vector3 platformPosition = transform.position;
+                platformPosition.x = availablePositions[randomIndex];
+                availablePositions.RemoveAt(randomIndex);
+                platformPosition.y += Random.Range(-yOffsetRange, yOffsetRange);
 
-                // Add a small random y-offset to create variety in height
-                temp.y += Random.Range(-yOffsetRange, yOffsetRange);
-
-                GameObject newPlatform = null;
-
-                // Randomly select the type of platform to spawn
-                if (platform_Spawn_Count == 4 && Random.Range(0, 2) == 0)
-                {
-                    newPlatform = Instantiate(breakablePlatform, temp, Quaternion.identity);
-                    platform_Spawn_Count = 0; // Reset count after breakable platform
-                }
-                else if (Random.Range(0, 2) > 0)
-                {
-                    newPlatform = Instantiate(platformPrefab, temp, Quaternion.identity);
-                }
-                else
-                {
-                    newPlatform = Instantiate(moving_Platforms[Random.Range(0, moving_Platforms.Length)], temp, Quaternion.identity);
-                }
+                GameObject newPlatform = InstantiateRandomPlatform(platformPosition);
 
                 if (newPlatform)
                 {
@@ -69,7 +49,29 @@ public class PlatformSpawner : MonoBehaviour
                 }
             }
 
-            current_Platform_Spawn_Timer = 0; // Reset timer after spawning row
+            current_Platform_Spawn_Timer = 0;
         }
+    }
+
+    GameObject InstantiateRandomPlatform(Vector3 position)
+    {
+        GameObject newPlatform = null;
+
+        // Select the type of platform to spawn
+        if (platform_Spawn_Count == 4 && Random.Range(0, 2) == 0)
+        {
+            newPlatform = Instantiate(breakablePlatform, position, Quaternion.identity);
+            platform_Spawn_Count = 0;
+        }
+        else if (Random.Range(0, 2) > 0)
+        {
+            newPlatform = Instantiate(platformPrefab, position, Quaternion.identity);
+        }
+        else
+        {
+            newPlatform = Instantiate(moving_Platforms[Random.Range(0, moving_Platforms.Length)], position, Quaternion.identity);
+        }
+
+        return newPlatform;
     }
 }

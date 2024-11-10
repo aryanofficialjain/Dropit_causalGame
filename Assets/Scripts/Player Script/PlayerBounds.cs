@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class PlayerBound : MonoBehaviour
 {
-    // Start is called before the first frame update
-
-    public float min_X = -2.6f, max_X = 2.6f, min_Y = -5.6f;
+    public float min_X = -1f, max_X = 1f, min_Y = -5.6f;
     private bool Out_of_bounds;
 
     void Update(){
@@ -16,33 +14,33 @@ public class PlayerBound : MonoBehaviour
     void CheckBounds(){
         Vector2 temp = transform.position;
 
+        // Limit X position to be within the min and max bounds
         if(temp.x > max_X){
             temp.x = max_X;
         }
-
         if(temp.x < min_X){
-            temp.x = min_Y;
+            temp.x = min_X;
         }
 
+        // Apply the modified position back to the transform
         transform.position = temp;
 
+        // Check Y position for out-of-bounds and trigger game over
         if(temp.y <= min_Y){
             if(!Out_of_bounds){
                 Out_of_bounds = true;
-
-                // sound manager death sound;
                 SoundManager.instance.DeathSound();
-                 GameManager.instance.ShowGameOver();
-                // gamemanager restart game;
+                GameManager.instance.ShowGameOver();
             }
         }
     }
 
     void OnTriggerEnter2D(Collider2D target){
         if(target.tag == "Top Spikes"){
+            // Move player far offscreen as a "death" effect
             transform.position = new Vector2(1000f, 1000f);
-                 SoundManager.instance.DeathSound();
-                 GameManager.instance.ShowGameOver();
+            SoundManager.instance.DeathSound();
+            GameManager.instance.ShowGameOver();
         }
     }
 }
